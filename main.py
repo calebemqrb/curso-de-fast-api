@@ -23,10 +23,19 @@ async def get_curso_pelo_id(id: int):
 async def post_curso(curso: Curso):
     next_id = len(cursos) + 1 
     # curso.id = next_id
-    del curso.id
     cursos[next_id] = curso 
+    del curso.id
     return curso
 
+@app.put('/cursos/{id}')
+async def put_curso(id: int, curso: Curso):
+    if id in cursos:
+        cursos[id] = curso
+        del curso.id
+        return curso
+    else:
+        raise HTTPException(status_code=status.HTTP_404_NOT_FOUND, detail='Curso não encontrado')
+    
 if  __name__ == "__main__":
     import uvicorn
 
