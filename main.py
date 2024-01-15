@@ -12,7 +12,7 @@ async def get_cursos():
     return cursos
 
 @app.get('/cursos/{id}')
-async def get_curso_pelo_id(id: int = Path(default=None, title='ID do curso', description='Deve existir', gt=0)):
+async def get_curso_pelo_id(id: int = Path(..., title='ID do curso', description='Deve existir', gt=0)):
     try:
         curso = cursos[id]
         return curso
@@ -43,6 +43,12 @@ async def delete_curso(id: int, curso: Curso):
         return Response(status_code=status.HTTP_204_NO_CONTENT)
     else:
         raise HTTPException(status_code=status.HTTP_404_NOT_FOUND, detail='Curso não encontrado')
+    
+
+@app.get('/calculadora')
+async def calcular(a, b, c):
+    soma = a + b + c
+    return {"resultado": soma}
     
 if  __name__ == "__main__":
     import uvicorn
