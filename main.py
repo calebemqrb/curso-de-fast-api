@@ -1,6 +1,6 @@
 from fastapi import FastAPI, HTTPException, status, Response
 
-from model import Curso
+from models.curso_model import Curso
 
 app = FastAPI()
 
