@@ -1,4 +1,12 @@
-from fastapi import FastAPI, HTTPException, Path, Response,status
+from typing import Optional
+from fastapi import (
+    FastAPI, 
+    HTTPException, 
+    Path,
+    Query, 
+    Response,
+    status
+)
 
 from models.curso_model import Curso
 
@@ -46,8 +54,11 @@ async def delete_curso(id: int, curso: Curso):
     
 
 @app.get('/calculadora')
-async def calcular(a, b, c):
-    soma = a + b + c
+async def calcular(a: int = Query(default=None, gt=5), b: int = Query(default=None, gt=10), c: Optional[int] = None):
+    soma = a + b
+    if c:
+        soma = soma + c
+
     return {"resultado": soma}
     
 if  __name__ == "__main__":
