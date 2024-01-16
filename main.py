@@ -1,6 +1,7 @@
 from typing import Optional
 from fastapi import (
-    FastAPI, 
+    FastAPI,
+    Header, 
     HTTPException, 
     Path,
     Query, 
@@ -54,10 +55,12 @@ async def delete_curso(id: int, curso: Curso):
     
 
 @app.get('/calculadora')
-async def calcular(a: int = Query(default=None, gt=5), b: int = Query(default=None, gt=10), c: Optional[int] = None):
+async def calcular(a: int = Query(default=None, gt=5), b: int = Query(default=None, gt=10), c: Optional[int] = None, d: str = Header(default=None)):
     soma = a + b
     if c:
         soma = soma + c
+
+    print(f'Header: {d}')
 
     return {"resultado": soma}
     
