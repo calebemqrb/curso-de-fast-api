@@ -1,5 +1,5 @@
 from time import sleep
-from typing import Any, Optional
+from typing import Any, Dict, Optional
 
 from fastapi import (
     Depends,
@@ -21,16 +21,27 @@ def fake_db():
     finally:
         print('Encerrando conexão com o Database')
 
-app = FastAPI()
+app = FastAPI(
+    title='Curso de FastAPI',
+    version='0.0.14',
+    description='API desenvolvida para estudos'
+    )
 
 cursos = {
 }
 
-@app.get('/cursos/')
+@app.get('/cursos/',
+         summary='Retorna os cursos cadastrados', 
+         description='Retorna todos os cursos cadastrados ou uma lista vazia',
+         response_model=list[Curso]
+         )
 async def get_cursos(db: Any = Depends(fake_db)):
     return cursos
 
-@app.get('/cursos/{id}')
+@app.get('/cursos/{id}',
+         summary='Retorna um único curso',
+         description='Busca e retorna um curso pelo seu id, se o curso não existir é retornado 404',
+         response_model=Curso)
 async def get_curso_pelo_id(id: int = Path(..., title='ID do curso', description='Deve existir', gt=0),db: Any = Depends(fake_db)):
     try:
         curso = cursos[id]
@@ -38,7 +49,10 @@ async def get_curso_pelo_id(id: int = Path(..., title='ID do curso', description
     except KeyError:
         raise HTTPException(status_code=status.HTTP_404_NOT_FOUND, detail='Curso não encontrado')
     
-@app.post('/cursos', status_code=status.HTTP_201_CREATED)
+@app.post('/cursos',
+          status_code=status.HTTP_201_CREATED,
+          summary='Insere um novo curso',
+          description='Se todas as informações forem passadas corretamente, insere o curso na lista')
 async def post_curso(curso: Curso, db: Any = Depends(fake_db)):
     next_id = len(cursos) + 1 
     # curso.id = next_id
@@ -46,7 +60,9 @@ async def post_curso(curso: Curso, db: Any = Depends(fake_db)):
     del curso.id
     return curso
 
-@app.put('/cursos/{id}')
+@app.put('/cursos/{id}',
+         summary='Atualiza o curso',
+         description='Busca e atualiza um curso pelo seu id, se o curso não existir é retornado 404')
 async def put_curso(id: int, curso: Curso, db: Any = Depends(fake_db)):
     if id in cursos:
         cursos[id] = curso
@@ -55,7 +71,9 @@ async def put_curso(id: int, curso: Curso, db: Any = Depends(fake_db)):
     else:
         raise HTTPException(status_code=status.HTTP_404_NOT_FOUND, detail='Curso não encontrado')
     
-@app.delete('/cursos/{id}')
+@app.delete('/cursos/{id}',
+            summary='Deleta o curso',
+            description='Busca e deleta um curso pelo seu id, se o curso não existir é retornado 404')
 async def delete_curso(id: int, curso: Curso, db: Any = Depends(fake_db)):
     if id in cursos:
         del cursos[id]
