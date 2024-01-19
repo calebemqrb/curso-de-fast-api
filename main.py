@@ -1,5 +1,8 @@
-from typing import Optional
+from time import sleep
+from typing import Any, Optional
+
 from fastapi import (
+    Depends,
     FastAPI,
     Header, 
     HTTPException, 
@@ -11,17 +14,24 @@ from fastapi import (
 
 from models.curso_model import Curso
 
+def fake_db():
+    try:
+        print('Estabelecendo conexão com o Database')
+        sleep(3)
+    finally:
+        print('Encerrando conexão com o Database')
+
 app = FastAPI()
 
 cursos = {
 }
 
 @app.get('/cursos/')
-async def get_cursos():
+async def get_cursos(db: Any = Depends(fake_db)):
     return cursos
 
 @app.get('/cursos/{id}')
-async def get_curso_pelo_id(id: int = Path(..., title='ID do curso', description='Deve existir', gt=0)):
+async def get_curso_pelo_id(id: int = Path(..., title='ID do curso', description='Deve existir', gt=0),db: Any = Depends(fake_db)):
     try:
         curso = cursos[id]
         return curso
@@ -29,7 +39,7 @@ async def get_curso_pelo_id(id: int = Path(..., title='ID do curso', description
         raise HTTPException(status_code=status.HTTP_404_NOT_FOUND, detail='Curso não encontrado')
     
 @app.post('/cursos', status_code=status.HTTP_201_CREATED)
-async def post_curso(curso: Curso):
+async def post_curso(curso: Curso, db: Any = Depends(fake_db)):
     next_id = len(cursos) + 1 
     # curso.id = next_id
     cursos[next_id] = curso 
@@ -37,7 +47,7 @@ async def post_curso(curso: Curso):
     return curso
 
 @app.put('/cursos/{id}')
-async def put_curso(id: int, curso: Curso):
+async def put_curso(id: int, curso: Curso, db: Any = Depends(fake_db)):
     if id in cursos:
         cursos[id] = curso
         del curso.id
@@ -46,7 +56,7 @@ async def put_curso(id: int, curso: Curso):
         raise HTTPException(status_code=status.HTTP_404_NOT_FOUND, detail='Curso não encontrado')
     
 @app.delete('/cursos/{id}')
-async def delete_curso(id: int, curso: Curso):
+async def delete_curso(id: int, curso: Curso, db: Any = Depends(fake_db)):
     if id in cursos:
         del cursos[id]
         return Response(status_code=status.HTTP_204_NO_CONTENT)
@@ -55,7 +65,7 @@ async def delete_curso(id: int, curso: Curso):
     
 
 @app.get('/calculadora')
-async def calcular(a: int = Query(default=None, gt=5), b: int = Query(default=None, gt=10), c: Optional[int] = None, d: str = Header(default=None)):
+async def calcular(a: int = Query(default=None, gt=5), b: int = Query(default=None, gt=10), c: Optional[int] = None, d: str = Header(default=None), db: Any = Depends(fake_db)):
     soma = a + b
     if c:
         soma = soma + c
