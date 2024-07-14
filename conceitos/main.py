@@ -58,7 +58,7 @@ async def post_curso(curso: Curso, db: Any = Depends(fake_db)):
     # curso.id = next_id
     cursos[next_id] = curso 
     del curso.id
-    return curso
+    return curso 
 
 @app.put('/cursos/{id}',
          summary='Atualiza o curso',
